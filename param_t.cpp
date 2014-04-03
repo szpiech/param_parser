@@ -126,6 +126,47 @@ bool param_t::addFlag(string flag, const char value[], string label, string desc
     return this->addFlag(flag, string(value), label, description);
 }
 
+bool param_t::addListFlag(string flag, double value, string label, string description)
+{
+    if (!flagExists(flag))
+    {
+        string buffer;
+        char charBuffer[100];
+        sprintf(charBuffer, "%f", value);
+        buffer = charBuffer;
+        listargd[flag].push_back(value);
+        help[flag] = "<double1> ... <doubleN>: " + description + "\n\tDefault: " + buffer;
+        labels[flag] = label;
+    }
+    else
+    {
+        cerr << "ERROR: " << flag << " already exists.\n";
+        throw 0;
+    }
+
+    return true;
+}
+bool param_t::addListFlag(string flag, char value, string label, string description)
+{
+    if (!flagExists(flag))
+    {
+        string buffer;
+        char charBuffer[100];
+        sprintf(charBuffer, "%c", value);
+        buffer = charBuffer;
+        listargch[flag].push_back(value);
+        help[flag] = "<char1> ... <charN>: " + description + "\n\tDefault: " + buffer;
+        labels[flag] = label;
+    }
+    else
+    {
+        cerr << "ERROR: " << flag << " already exists.\n";
+        throw 0;
+    }
+
+    return true;
+}
+
 bool param_t::addListFlag(string flag, int value, string label, string description)
 {
     if (!flagExists(flag))
@@ -280,7 +321,7 @@ bool param_t::parseCommandLine(int argc, char *argv[])
                         i++;
                     }
                     //if it is a bad int...
-                    else if (!goodInt(string(argv[i + 1])) && !flagExists(string(argv[i + 1]))) 
+                    else if (!goodInt(string(argv[i + 1])) && !flagExists(string(argv[i + 1])))
                     {
                         cerr << "ERROR: " << argv[i + 1] << " is not a valid integer.\n";
                         badFlags++;
@@ -317,6 +358,44 @@ bool param_t::parseCommandLine(int argc, char *argv[])
                 argd[argv[i]] = atof(argv[i + 1]);
                 isSet[argv[i]] = true;
                 i++;
+            }
+        }
+        else if (listargd.count(argv[i]) > 0)
+        {
+            if (i + 1 >= argc)
+            {
+                cerr << "ERROR: No argument found for " << argv[i] << ".\n";
+                badFlags++;
+                break;
+            }
+            else
+            {
+                listargd[argv[i]].clear();//clear the default value
+                int flagIndex = i;//remember where the flag is in argv
+                while (i + 1 < argc) //go until the end of the list
+                {
+                    if (goodDouble(string(argv[i + 1]))) //make sure the next value is OK
+                    {
+                        listargd[argv[flagIndex]].push_back(atof(argv[i + 1]));
+                        i++;
+                    }
+                    //if it is a bad int...
+                    else if (!goodDouble(string(argv[i + 1])) && !flagExists(string(argv[i + 1])))
+                    {
+                        cerr << "ERROR: " << argv[i + 1] << " is not a valid double.\n";
+                        badFlags++;
+                        break;
+                    }
+                    else //if the next value is another flag..
+                    {
+                        if (listargd[argv[flagIndex]].size() == 0)
+                        {
+                            cerr << "ERROR: No arguments found for " << argv[flagIndex] << ".\n";
+                            badFlags++;
+                        }
+                        break;
+                    }
+                }
             }
         }
         else if (args.count(argv[i]) > 0)
@@ -384,6 +463,44 @@ bool param_t::parseCommandLine(int argc, char *argv[])
                 argch[argv[i]] = argv[i + 1][0];
                 isSet[argv[i]] = true;
                 i++;
+            }
+        }
+        else if (listargch.count(argv[i]) > 0)
+        {
+            if (i + 1 >= argc)
+            {
+                cerr << "ERROR: No argument found for " << argv[i] << ".\n";
+                badFlags++;
+                break;
+            }
+            else
+            {
+                listargch[argv[i]].clear();//clear the default value
+                int flagIndex = i;//remember where the flag is in argv
+                while (i + 1 < argc) //go until the end of the list
+                {
+                    if (goodChar(string(argv[i + 1]))) //make sure the next value is OK
+                    {
+                        listargch[argv[flagIndex]].push_back(atoi(argv[i + 1]));
+                        i++;
+                    }
+                    //if it is a bad int...
+                    else if (!goodChar(string(argv[i + 1])) && !flagExists(string(argv[i + 1])))
+                    {
+                        cerr << "ERROR: " << argv[i + 1] << " is not a valid character.\n";
+                        badFlags++;
+                        break;
+                    }
+                    else //if the next value is another flag..
+                    {
+                        if (listargch[argv[flagIndex]].size() == 0)
+                        {
+                            cerr << "ERROR: No arguments found for " << argv[flagIndex] << ".\n";
+                            badFlags++;
+                        }
+                        break;
+                    }
+                }
             }
         }
         else //if (argv[i][0] == '-')
@@ -465,6 +582,22 @@ vector<string> param_t::getStringListFlag(string flag)
 vector<int> param_t::getIntListFlag(string flag)
 {
     if (listargi.count(flag) > 0) return listargi[flag];
+
+    cerr << "ERROR: There are no int list flags named " << flag << "\n";
+    throw 0;
+}
+
+vector<double> param_t::getDoubleListFlag(string flag)
+{
+    if (listargd.count(flag) > 0) return listargd[flag];
+
+    cerr << "ERROR: There are no double list flags named " << flag << "\n";
+    throw 0;
+}
+
+vector<char> param_t::getCharListFlag(string flag)
+{
+    if (listargch.count(flag) > 0) return listargch[flag];
 
     cerr << "ERROR: There are no int list flags named " << flag << "\n";
     throw 0;

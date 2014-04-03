@@ -17,7 +17,9 @@ int main(int argc, char *argv[])
     params.addFlag("--stringFlag", "string", "boolLabel", "A test bool flag.");
     params.addFlag("--silentFlag", "string", "SILENT", "This flag won't be in --help.");
     params.addListFlag("--stringList", "stringList", "", "A test string list flag.");
-    params.addListFlag("--intList",0,"","A test int list flag.");
+    params.addListFlag("--intList", 0, "", "A test int list flag.");
+    params.addListFlag("--doubleList", 1.0, "", "A test double list flag.");
+    params.addListFlag("--charList", 'a', "", "A test char list flag.");
 
     try
     {
@@ -38,9 +40,9 @@ int main(int argc, char *argv[])
 
     vector<string> list = params.getStringListFlag("--stringList");
 
-    for(int i = 0; i < list.size(); i++)
+    for (int i = 0; i < list.size(); i++)
     {
-      cerr << list[i] << " ";
+        cerr << list[i] << " ";
     }
     cerr << endl;
 
@@ -48,9 +50,29 @@ int main(int argc, char *argv[])
 
     vector<int> list2 = params.getIntListFlag("--intList");
 
-    for(int i = 0; i < list2.size(); i++)
+    for (int i = 0; i < list2.size(); i++)
     {
-      cerr << list2[i] << " ";
+        cerr << list2[i] << " ";
+    }
+    cerr << endl;
+
+    cerr << "--doubleList ";
+
+    vector<double> list3 = params.getDoubleListFlag("--doubleList");
+
+    for (int i = 0; i < list3.size(); i++)
+    {
+        cerr << list3[i] << " ";
+    }
+    cerr << endl;
+
+    cerr << "--intList ";
+
+    vector<char> list4 = params.getCharListFlag("--charList");
+
+    for (int i = 0; i < list4.size(); i++)
+    {
+        cerr << list4[i] << " ";
     }
     cerr << endl;
 

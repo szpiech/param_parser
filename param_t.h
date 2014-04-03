@@ -42,7 +42,8 @@ public:
     bool addListFlag(string flag, string value, string label, string description);
     bool addListFlag(string flag, const char value[], string label, string description);
     bool addListFlag(string flag, int value, string label, string description);
-
+    bool addListFlag(string flag, double value, string label, string description);
+    bool addListFlag(string flag, char value, string label, string description);
 
     void printHelp();
 
@@ -56,6 +57,8 @@ public:
 
     vector<string> getStringListFlag(string flag);
     vector<int> getIntListFlag(string flag);
+    vector<double> getDoubleListFlag(string flag);
+    vector<char> getCharListFlag(string flag);
 
     void setPreamble(string str);
 
@@ -71,11 +74,12 @@ private:
     map<string, string> args;
 
     map<string, vector< string > > listargs;
-    map<string, vector< int > > listargi;    
+    map<string, vector< int > > listargi;
+    map<string, vector< double > > listargd;
+    map<string, vector< char > > listargch;    
 
     map<string, string> help;
     map<string, bool> isSet;
-
     map<string, string> labels;
 
     bool goodDouble(string str);
