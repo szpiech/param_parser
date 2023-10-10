@@ -1,8 +1,0 @@
-param_t is a class that implements a simple command line argument parser.
-
-To compile and test,
-
-g++ -c param_t.cpp
-g++ -o test test.cpp param_t.o
-
-./test
